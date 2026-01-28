@@ -6,20 +6,30 @@ export default function CreatePaste() {
   const [views, setViews] = useState("");
   const [url, setUrl] = useState("");
 
-  const submit = async () => {
-    const res = await fetch("/api/pastes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        content,
-        ttl_seconds: ttl ? Number(ttl) : undefined,
-        max_views: views ? Number(views) : undefined
-      })
-    });
+const submit = async () => {
+  const res = await fetch("/api/pastes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      content,
+      ttl_seconds: ttl ? Number(ttl) : undefined,
+      max_views: views ? Number(views) : undefined
+    })
+  });
 
-    const data = await res.json();
-    setUrl(data.url);
-  };
+  
+  if (!res.ok) {
+    const t = await res.text();
+    console.error("API Error:", res.status, t);
+    alert("Failed to create paste");
+    return;
+  }
+
+ 
+  const data = await res.json();
+  setUrl(data.url);
+};
+
 
   return (
     <div style={{ padding: 20 }}>

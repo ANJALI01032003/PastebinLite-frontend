@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function CreatePaste() {
@@ -7,30 +8,34 @@ export default function CreatePaste() {
   const [views, setViews] = useState("");
   const [url, setUrl] = useState("");
 
-const submit = async () => {
-  const res = await fetch("https://pastebinlite-backend.onrender.com/api/pastes", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      content,
-      ttl_seconds: ttl ? Number(ttl) : undefined,
-      max_views: views ? Number(views) : undefined
-    })
-  });
+  const submit = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/pastes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          content,
+          ttl_seconds: ttl ? Number(ttl) : undefined,
+          max_views: views ? Number(views) : undefined
+        })
+      });
 
-  
-  if (!res.ok) {
-    const t = await res.text();
-    console.error("API Error:", res.status, t);
-    alert("Failed to create paste");
-    return;
-  }
+      if (!res.ok) {
+        const t = await res.text();
+        console.error("API Error:", res.status, t);
+        alert("Failed to create paste");
+        return;
+      }
 
- 
-  const data = await res.json();
-  setUrl(data.url);
-};
-
+      const data = await res.json();
+      setUrl(data.url);
+    } catch (err) {
+      console.error("Network Error:", err);
+      alert("Server not reachable");
+    }
+  };
 
   return (
     <div style={{ padding: 20 }}>
@@ -40,6 +45,7 @@ const submit = async () => {
         rows="8"
         cols="50"
         placeholder="Enter text"
+        value={content}
         onChange={(e) => setContent(e.target.value)}
       />
 
@@ -47,6 +53,7 @@ const submit = async () => {
 
       <input
         placeholder="TTL seconds (optional)"
+        value={ttl}
         onChange={(e) => setTtl(e.target.value)}
       />
 
@@ -54,6 +61,7 @@ const submit = async () => {
 
       <input
         placeholder="Max views (optional)"
+        value={views}
         onChange={(e) => setViews(e.target.value)}
       />
 
@@ -63,7 +71,7 @@ const submit = async () => {
 
       {url && (
         <p>
-          Paste URL: <a href={url}>{url}</a>
+          Paste URL: <a href={url} target="_blank">{url}</a>
         </p>
       )}
     </div>

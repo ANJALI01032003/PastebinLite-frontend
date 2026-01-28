@@ -8,34 +8,41 @@ export default function CreatePaste() {
   const [views, setViews] = useState("");
   const [url, setUrl] = useState("");
 
-  const submit = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/pastes`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          content,
-          ttl_seconds: ttl ? Number(ttl) : undefined,
-          max_views: views ? Number(views) : undefined
-        })
-      });
+const submit = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/pastes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content,
+        ttl_seconds: ttl ? Number(ttl) : undefined,
+        max_views: views ? Number(views) : undefined
+      })
+    });
 
-      if (!res.ok) {
-        const t = await res.text();
-        console.error("API Error:", res.status, t);
-        alert("Failed to create paste");
-        return;
-      }
+    const text = await res.text();
 
-      const data = await res.json();
-      setUrl(data.url);
-    } catch (err) {
-      console.error("Network Error:", err);
-      alert("Server not reachable");
+    if (!res.ok) {
+      console.error("API Error:", res.status, text);
+      alert("Failed to create paste");
+      return;
     }
-  };
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      console.error("Non-JSON response:", text);
+      alert("Invalid response from server");
+      return;
+    }
+
+    setUrl(data.url);
+  } catch (err) {
+    console.error("Network Error:", err);
+    alert("Server not reachable");
+  }
+};
 
   return (
     <div style={{ padding: 20 }}>

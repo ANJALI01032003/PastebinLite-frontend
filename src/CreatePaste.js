@@ -1,4 +1,5 @@
 import { useState } from "react";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function CreatePaste() {
   const [content, setContent] = useState("");

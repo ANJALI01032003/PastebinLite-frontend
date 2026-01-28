@@ -7,7 +7,7 @@ export default function CreatePaste() {
   const [url, setUrl] = useState("");
 
 const submit = async () => {
-  const res = await fetch("/api/pastes", {
+  const res = await fetch("https://pastebinlite-backend.onrender.com/api/pastes", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

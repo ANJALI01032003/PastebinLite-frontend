@@ -1,0 +1,60 @@
+import { useState } from "react";
+
+export default function CreatePaste() {
+  const [content, setContent] = useState("");
+  const [ttl, setTtl] = useState("");
+  const [views, setViews] = useState("");
+  const [url, setUrl] = useState("");
+
+  const submit = async () => {
+    const res = await fetch("/api/pastes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content,
+        ttl_seconds: ttl ? Number(ttl) : undefined,
+        max_views: views ? Number(views) : undefined
+      })
+    });
+
+    const data = await res.json();
+    setUrl(data.url);
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h2>Create Paste</h2>
+
+      <textarea
+        rows="8"
+        cols="50"
+        placeholder="Enter text"
+        onChange={(e) => setContent(e.target.value)}
+      />
+
+      <br /><br />
+
+      <input
+        placeholder="TTL seconds (optional)"
+        onChange={(e) => setTtl(e.target.value)}
+      />
+
+      <br /><br />
+
+      <input
+        placeholder="Max views (optional)"
+        onChange={(e) => setViews(e.target.value)}
+      />
+
+      <br /><br />
+
+      <button onClick={submit}>Create</button>
+
+      {url && (
+        <p>
+          Paste URL: <a href={url}>{url}</a>
+        </p>
+      )}
+    </div>
+  );
+}
